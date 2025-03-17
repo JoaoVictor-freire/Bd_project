@@ -1,13 +1,16 @@
 from secrets import token_urlsafe
 
-class Patiente:
-    def __int__ (self, name, age, history, contact, address):
+class Patient:
+    patients_list = []
+
+    def __init__ (self, name: str, age: int, history: str, contact: str, address: str):
         self.id = token_urlsafe(10)
         self.name = name
         self.age = age
         self.history = history
         self.contact = contact
         self.address = address
+        Patient.patients_list.append(self)
 
     def defId(self):
         return self.id
@@ -31,7 +34,7 @@ class Patiente:
     def setContact(self, contact):
         self.contact = contact
     def setAddress(self, address):
-        self.adress = address
+        self.address = address
 
     def cadastrar(self, name, age,history, contact, address):
         self.setName(name)
@@ -40,7 +43,7 @@ class Patiente:
         self.setContact(contact)
         self.setAddress(address)
 
-    def uptade(self, name = None, age = None, history = None, contact = None, address = None):
+    def update(self, name = None, age = None, history = None, contact = None, address = None):
         if(name != None): self.name = name
         if(age != None): self.age = age
         if(history != None): self.history = history
@@ -51,3 +54,28 @@ class Patiente:
         if(self.id == id):
             print(f'Nome: {self.name} | Idade: {self.age} | Endereço: {self.address} | Contato: {self.contact}')
     
+    def list_all():
+        print("\nLista de Pacientes:")
+        for patient in Patient.patients_list:
+            print(f"ID: {patient.id} | Nome: {patient.name} | Idade: {patient.age} | Histórico: {patient.history} | Contato: {patient.contact}")
+
+    def remove(patient_id: str):
+        for patient in Patient.patients_list:
+            if patient.id == patient_id:
+                Patient.patients_list.remove(patient)
+                print(f"Paciente {patient.name} removido com sucesso!")
+                return
+        print(f"Paciente com ID '{patient_id}' não encontrado.")
+
+    def listOne(name: str):
+        for patient in Patient.patients_list:
+            if patient.name.lower() == name.lower():
+                print(f"\nPaciente encontrado:\nID: {patient.id} | Nome: {patient.name} | Idade: {patient.age} | Histórico: {patient.history} | Contato: {patient.contact}")
+                return
+        print(f"Paciente '{name}' não encontrado.")
+
+    def search_Name(name: str):
+        for patient in Patient.patients_list:
+            if patient.name.lower() == name.lower():
+                return patient
+        return None  # Retorna None se o paciente não for encontrado
