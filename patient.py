@@ -3,7 +3,7 @@ from secrets import token_urlsafe
 class Patient:
     patients_list = []
 
-    def __init__ (self, name: str, age: int, history: str, contact: str, address: str):
+    def __init__ (self, name: str = "", age: int = 0, history: str = "", contact: str = "", address: str = ""):
         self.id = token_urlsafe(10)
         self.name = name
         self.age = age

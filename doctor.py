@@ -4,7 +4,7 @@ from secrets import token_urlsafe
 class Doctor:
     doctors_list = []
 
-    def __init__(self, name: str, specialty: str, service_hour:str, contact:str, salary: int):
+    def __init__(self, name: str = "", specialty: str = "", service_hour:str = "", contact:str = "", salary: int = 0):
         self.id = token_urlsafe(5)
         self.name = name
         self.speciality = specialty
