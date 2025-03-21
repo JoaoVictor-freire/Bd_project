@@ -31,7 +31,6 @@ def main():
             print("Opção inválida! Tente novamente.")
 
 def menu_doctors():
-    doctor = Doctor()
     while True:
         limpar_cmd()
         print("\nMédicos da Clínica NovaMed")
@@ -47,24 +46,32 @@ def menu_doctors():
         if option_m == "1":
             limpar_cmd()
             name = input("Digite o nome do médico: ")
-            doctor.listOne(name)
+            Doctor.listOne(name)
 
         elif option_m == "2":
             limpar_cmd()
-            doctor.list_all()
+            Doctor.list_all()
 
         elif option_m == "3":
             limpar_cmd()
-            doctor.cadastrar()
+            name = input("Nome: ")
+            specialty = input("Especialidade: ")
+            service_hour = input("Horário de Serviço: ")
+            contact = input("Contato: ")
+            salary = float(input("Salário: "))
+
+            Doctor().cadastrar(name, specialty, service_hour, contact, salary)
+            print("Médico cadastrado com sucesso!")
 
         elif option_m == "4":
             limpar_cmd()
-            doctor.update()
+            doctor_id = int(input("Digite o ID do médico: "))
+            Doctor.update(doctor_id)
 
         elif option_m == "5":
             limpar_cmd()
-            doctor_num = input("Digite o ID do médico: ")
-            doctor.remove(doctor_num)
+            doctor_id = int(input("Digite o ID do médico: "))
+            Doctor.remove(doctor_id)
 
         elif option_m == "6":
             limpar_cmd()
@@ -100,16 +107,34 @@ def menu_patients():
 
         elif option_p == "3":
             limpar_cmd()
-            patient.cadastrar()
+            name = input("Nome: ")
+            age = input("Idade: ")
+            history = input("Histórico médico: ")
+            contact = input("Contato: ")
+            adress = input("Endereço: ")
+
+            patient.cadastrar(name, age, history, contact, adress)
+            print("Paciente cadastrado com sucesso!")
 
         elif option_p == "4":
             limpar_cmd()
-            patient.update()
+            name = input("Digite o nome do paciente que deseja atualizar: ")
+            patient = Patient.search_Name(name)
+
+            if patient:
+                new_name = input("Nome: ")
+                new_age = input("Idade: ")
+                new_history = input("Histórico médico: ")
+                new_contact = input("Contato: ")
+                new_adress = input("Endereço: ")
+
+            patient.update(new_name, new_age, new_history, new_contact, new_adress)
+            print("Paciente atualizado com sucesso!")
 
         elif option_p == "5":
             limpar_cmd()
-            patient_num = input("Digite o ID do paciente: ")
-            patient.remove(patient_num)
+            patient_id = input("Digite o ID do paciente: ")
+            patient.remove(patient_id)
 
         elif option_p == "6":
             limpar_cmd()
