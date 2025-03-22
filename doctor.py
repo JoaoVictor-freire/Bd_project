@@ -85,3 +85,18 @@ class Doctor:
             if doctor.name.lower() == name.lower():
                 return doctor
         return None  # Retorna None se o médico não for encontrado
+    
+    @staticmethod
+    def consult(name: str):
+        encontrados = []
+
+        for doctor in Doctor.doctors_list:
+            if name.lower() in doctor.name.lower():
+                encontrados.append(doctor)
+
+        if encontrados:
+            print(f"\nMédicos encontrados com o nome contendo '{name}':")
+            for doctor in encontrados:
+                print(f"ID: {doctor.id} | Nome: {doctor.name} | Especialidade: {doctor.speciality}")
+        else:
+            print(f"Nenhum médico com nome contendo '{name}' foi encontrado.")

@@ -187,14 +187,32 @@ def menu_exams():
 
         if option_e == "1":
             limpar_cmd()
-            name = input("Nome do exame: ")
-            description = input("Descrição do exame: ")
-            price = float(input("Preço do exame: "))
+            
+            name = input("Digite o nome do médico que está buscando: ")
+            Doctor.consult(name)
+            doctor_id = input("Digite o ID do médico em questão: ")
+            doctor = Doctor.search_by_id(doctor_id)
+            if not doctor:
+                print("Médico não encontrado!")
+                pausar()
+                continue
+            limpar_cmd()
+
+            name = input("Digite o nome do paciente que está buscando: ")
+            Patient.consult(name)
+            patient_id = input("Digite o ID do paciente em questão: ")
+            patient = Patient.search_by_id(patient_id)
+            if not patient:
+                print("Paciente não encontrado!")
+                pausar()
+                continue
+
             date = input("Data do exame (DD/MM/AAAA): ")
             hour = input("Horário do exame (HH:MM): ")
-            exam = Exam(name, description, price, date, hour)
-            exam.register_exam()
+            # Cria o exame com status padrão "Scheduled"
+            Exam(doctor, patient, "Scheduled", date, hour)
             print("Exame cadastrado com êxito no sistema")
+
             pausar()
 
         elif option_e == "2":
