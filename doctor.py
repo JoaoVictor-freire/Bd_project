@@ -35,25 +35,27 @@ class Doctor:
     def setSalary(self, salary):
         self.salary = salary
 
-    def cadastrar(self, name, specialty, service_hour, contact, salary):
-        self.name = name
-        self.speciality = specialty
-        self.service_hour = service_hour
-        self.contact = contact
-        self.salary = salary
+    def update(self):
+        print("Digite onde deseja ser alterado e caso não deseje alterações pressione enter deixando o item em branco:")
+        name = input("Nome: ")
+        specialty = input("Especialidade: ")
+        service_hour = input("Horário de atendimento: ")
+        contact = input("Contato: ")
+        salary = int(input("Salario: "))
 
-    def update(self, name = None, specialty = None, service_hour = None, contact = None, salary = None):
-        if(name != None): self.name = name
-        if(specialty != None): self.age = specialty
-        if(service_hour != None): self.history = service_hour
-        if(contact != None): self.contact = contact
-        if(salary != None): self.address = salary
+        if(name != ""): self.name = name
+        if(specialty != ""): self.age = specialty
+        if(service_hour != ""): self.history = service_hour
+        if(contact != ""): self.contact = contact
+        if(salary >= 0): self.address = salary
 
+    @staticmethod
     def list_all():
         print("\nLista de Médicos:")
         for doctor in Doctor.doctors_list:
             print(f"ID: {doctor.id} | Nome: {doctor.name} | Especialidade: {doctor.speciality} | Contato: {doctor.contact}")
 
+    @staticmethod
     def remove(doctor_id: str):
         for doctor in Doctor.doctors_list:
             if doctor.id == doctor_id:
@@ -62,6 +64,14 @@ class Doctor:
                 return
         print(f"Médico com ID '{doctor_id}' não encontrado.")
 
+    @staticmethod
+    def search_by_id(doctor_id: str):
+        for doctor in Doctor.doctors_list:
+            if doctor.id == doctor_id:
+                return doctor
+        return None  # Retorna None se não encontrar
+
+    @staticmethod
     def listOne(name: str):
         for doctor in Doctor.doctors_list:
             if doctor.name.lower() == name.lower():
@@ -69,6 +79,7 @@ class Doctor:
                 return
         print(f"Médico '{name}' não encontrado.")
 
+    @staticmethod
     def search_Name(name: str):
         for doctor in Doctor.doctors_list:
             if doctor.name.lower() == name.lower():

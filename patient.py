@@ -36,29 +36,49 @@ class Patient:
     def setAddress(self, address):
         self.address = address
 
-    def cadastrar(self, name, age,history, contact, address):
-        self.setName(name)
-        self.setAge(age)
-        self.setHistory(history)
-        self.setContact(contact)
-        self.setAddress(address)
+    def update(self):
+        print("Digite onde deseja ser alterado e caso não deseje alterações pressione enter deixando o item em branco:")
+        name = input("Nome: ")
+        age = int(input("Idade: "))
+        history = input("Histórico: ")
+        contact = input("Contato: ")
+        address = input("Endereço: ")
 
-    def update(self, name = None, age = None, history = None, contact = None, address = None):
-        if(name != None): self.name = name
-        if(age != None): self.age = age
-        if(history != None): self.history = history
-        if(contact != None): self.contact = contact
-        if(address != None): self.address = address
+        if(name != ""): self.name = name
+        if(age > 0 ): self.age = age
+        if(history != ""): self.history = history
+        if(contact != ""): self.contact = contact
+        if(address != ""): self.address = address
 
-    def consult(self, id):
-        if(self.id == id):
-            print(f'Nome: {self.name} | Idade: {self.age} | Endereço: {self.address} | Contato: {self.contact}')
+    @staticmethod
+    def search_by_id(patient_id: str):
+        for patient in Patient.patients_list:
+            if patient.id == patient_id:
+                return patient
+        return None  # Retorna None se não encontrar
+
+    @staticmethod
+    def consult(name: str):
+        encontrados = []
+
+        for patient in Patient.patients_list:
+            if name.lower() in patient.name.lower():
+                encontrados.append(patient)
+
+        if encontrados:
+            print(f"\nPacientes encontrados com o nome contendo '{name}':")
+            for patient in encontrados:
+                print(f"ID: {patient.id} | Nome: {patient.name} | Idade: {patient.age} | Endereço: {patient.address} | Contato: {patient.contact}")
+        else:
+            print(f"Nenhum paciente com nome contendo '{name}' foi encontrado.")
     
+    @staticmethod
     def list_all():
         print("\nLista de Pacientes:")
         for patient in Patient.patients_list:
             print(f"ID: {patient.id} | Nome: {patient.name} | Idade: {patient.age} | Histórico: {patient.history} | Contato: {patient.contact}")
 
+    @staticmethod
     def remove(patient_id: str):
         for patient in Patient.patients_list:
             if patient.id == patient_id:
@@ -67,6 +87,7 @@ class Patient:
                 return
         print(f"Paciente com ID '{patient_id}' não encontrado.")
 
+    @staticmethod
     def listOne(name: str):
         for patient in Patient.patients_list:
             if patient.name.lower() == name.lower():
