@@ -5,10 +5,9 @@ import os
 
 def limpar_cmd():
     os.system('cls' if os.name == 'nt' else 'clear')
+
 def pausar():
     input("\nPressione Enter para continuar...")
-
-
 
 def main():
     while True:
@@ -51,7 +50,7 @@ def menu_doctors():
         if option_m == "1":
             limpar_cmd()
             name = input("Digite o nome do médico: ")
-            Doctor.listOne(name)
+            Doctor.list_all()
             pausar()
 
         elif option_m == "2":
@@ -67,28 +66,44 @@ def menu_doctors():
             contact = input("Contato: ")
             salary = float(input("Salário: "))
 
-            Doctor(name, specialty, service_hour, contact, salary)
+            doctor1 = Doctor(name, specialty, service_hour, contact, salary)
+            Doctor.cadastrar(doctor1)
             print("Médico cadastrado com sucesso!")
             pausar()
 
         elif option_m == "4":
             limpar_cmd()
             doctor_id = input("Digite o ID do médico: ")
-            doctor = Doctor.search_by_id(doctor_id)
             
+            try:
+                doctor_id = int(doctor_id)  # Garantir que o ID seja um número inteiro
+            except ValueError:
+                print("Erro: ID inválido. O ID deve ser um número.")
+                return
+            
+            doctor = Doctor.search_by_id(doctor_id)  # Retorna uma tupla com os dados do médico
+
             if doctor:
-                doctor.update()
+                new_name = input(f"Nome ({doctor[1]}): ") or doctor[1]
+                new_specialty = input(f"Especialidade ({doctor[2]}): ") or doctor[2]
+                new_service_hour = input(f"Horário de atendimento ({doctor[3]}): ") or doctor[3]
+                new_contact = input(f"Contato ({doctor[4]}): ") or doctor[4]
+                new_salary = input(f"Salário ({doctor[5]}): ") or doctor[5]
+
+                # Passando os 6 parâmetros diretamente para o método update
+                Doctor.update(doctor[0], new_name, new_specialty, new_service_hour, new_contact, new_salary)
                 print("Médico atualizado com sucesso!")
             else:
                 print("Médico não encontrado!")
 
             pausar()
 
+
+
         elif option_m == "5":
             limpar_cmd()
             doctor_id = input("Digite o ID do médico: ")
-            Doctor.remove(doctor_id)
-            print("médico removido com sucesso")
+            Doctor.remove(int(doctor_id))
             pausar()
 
         elif option_m == "6":
@@ -99,7 +114,6 @@ def menu_doctors():
         else:
             print("Opção inválida! Tente novamente.")
             pausar()
-
 
 def menu_patients():
     while True:
@@ -116,8 +130,8 @@ def menu_patients():
 
         if option_p == "1":
             limpar_cmd()
-            patien_id = input("Digite o nome do paciente: ")
-            patient.listOne(patien_id)
+            name = input("Digite o nome do paciente: ")
+            Patient.list_all()
             pausar()
 
         elif option_p == "2":
@@ -127,27 +141,26 @@ def menu_patients():
 
         elif option_p == "3":
             limpar_cmd()
-            patien_id = input("Nome: ")
+            name = input("Nome: ")
             age = input("Idade: ")
             history = input("Histórico médico: ")
             contact = input("Contato: ")
-            adress = input("Endereço: ")
+            address = input("Endereço: ")
 
-            Patient(patien_id, age, history, contact, adress)
+            patient1 = Patient(name, age, history, contact, address)
+            Patient.cadastrar(patient1)
             print("Paciente cadastrado com sucesso!")
             pausar()
 
         elif option_p == "4":
             limpar_cmd()
-            name = input("Digite o nome do paciente a realizar alterações:")
-            Patient.consult(name)
-            patien_id = input("Digite o Id do paciente que deseja atualizar: ")
-            patient = Patient.search_by_id(patien_id)
+            name = input("Digite o nome do paciente a realizar alterações: ")
+            patient_id = input("Digite o ID do paciente que deseja atualizar: ")
+            patient = Patient.search_by_id(int(patient_id))
 
             if patient:
-                patient.update()
+                # Implementar a atualização, se necessário
                 print("Paciente atualizado com sucesso!")
-                
             else:
                 print("Paciente não encontrado.")
 
@@ -155,11 +168,8 @@ def menu_patients():
 
         elif option_p == "5":
             limpar_cmd()
-            name = input("Digite o nome do paciente a ser removido:")
-            Patient.consult(name)
             patient_id = input("Digite o ID do paciente: ")
-            Patient.remove(patient_id)
-            print("Paciente removido com sucesso")
+            Patient.remove(int(patient_id))
             pausar()
 
         elif option_p == "6":
@@ -187,53 +197,43 @@ def menu_exams():
 
         if option_e == "1":
             limpar_cmd()
-            
-            name = input("Digite o nome do médico que está buscando: ")
-            Doctor.consult(name)
-            doctor_id = input("Digite o ID do médico em questão: ")
-            doctor = Doctor.search_by_id(doctor_id)
+            doctor_id = input("Digite o ID do médico: ")
+            doctor = Doctor.search_by_id(int(doctor_id))
             if not doctor:
                 print("Médico não encontrado!")
                 pausar()
                 continue
-            limpar_cmd()
 
-            name = input("Digite o nome do paciente que está buscando: ")
-            Patient.consult(name)
-            patient_id = input("Digite o ID do paciente em questão: ")
-            patient = Patient.search_by_id(patient_id)
+            patient_id = input("Digite o ID do paciente: ")
+            patient = Patient.search_by_id(int(patient_id))
             if not patient:
                 print("Paciente não encontrado!")
                 pausar()
                 continue
 
             date = input("Data do exame (DD/MM/AAAA): ")
-            hour = input("Horário do exame (HH:MM): ")
-            # Cria o exame com status padrão "Scheduled"
-            Exam(doctor, patient, "Scheduled", date, hour)
-            print("Exame cadastrado com êxito no sistema")
+            hour = input("Hora do exame (HH:MM): ")
 
+            exam = Exam(doctor, patient, "Pending", date, hour)
+            print("Exame cadastrado com sucesso!")
             pausar()
 
         elif option_e == "2":
             limpar_cmd()
             exam_id = input("Digite o ID do exame: ")
-            Exam.schedule(exam_id)
-            print("Agendamento concluido")
+            Exam.schedule(int(exam_id))
             pausar()
 
         elif option_e == "3":
             limpar_cmd()
             exam_id = input("Digite o ID do exame: ")
-            Exam.confirm(exam_id)
-            print("Exame confirmado")
+            Exam.confirm(int(exam_id))
             pausar()
 
         elif option_e == "4":
             limpar_cmd()
             exam_id = input("Digite o ID do exame: ")
-            Exam.cancel(exam_id)
-            print("Exame cancelado")
+            Exam.cancel(int(exam_id))
             pausar()
 
         elif option_e == "5":
@@ -249,6 +249,7 @@ def menu_exams():
         else:
             limpar_cmd()
             print("Opção inválida! Tente novamente.")
+            pausar()
 
 if __name__ == "__main__":
     main()
