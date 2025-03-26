@@ -137,7 +137,7 @@ class Patient:
                 return patient
             else:
                 print(f"Paciente com ID '{patient_id}' não encontrado.")
-                return None
+                return False
         except Exception as e:
             print(f"Erro ao buscar paciente: {e}")
         finally:

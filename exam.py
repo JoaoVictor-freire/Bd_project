@@ -2,43 +2,15 @@ import psycopg2
 from psycopg2 import sql
 from doctor import Doctor
 from patient import Patient
-from secrets import token_urlsafe
 from db import get_connection
 
 class Exam:
     def __init__(self, doctor: Doctor = None, patient: Patient = None, status: str = "", date: str = "", hour: str = "", id: str = None):
-        self.id = id or token_urlsafe(8)  # Gera um ID único se não for fornecido
+        self.id = id
         self.doctor = doctor
         self.patient = patient
         self.status = status
         self.date = date
-        self.hour = hour
-
-    def getId(self):
-        return self.id
-
-    def getDoctor(self):
-        return self.doctor
-
-    def getPatient(self):
-        return self.patient
-
-    def getStatus(self):
-        return self.status
-
-    def getDate(self):
-        return self.date
-
-    def getHour(self):
-        return self.hour
-
-    def setStatus(self, status):
-        self.status = status
-
-    def setDate(self, date):
-        self.date = date
-
-    def setHour(self, hour):
         self.hour = hour
 
     def schedule(self, doctor: Doctor, patient: Patient, date: str, hour: str, status: str = "Scheduled"):
@@ -62,39 +34,58 @@ class Exam:
         print(f"Paciente: {self.patient.name} | Médico: {self.doctor.name}")
         print(f"Data: {self.date} | Hora: {self.hour} | Status: {self.status}")
 
-    def register_exam(self):
-        # Registra um exame no banco de dados
+    def register_exam(self, doctor_id, patient_id, exam_date, exam_time, status):
+    # Registra um exame no banco de dados
         conn = get_connection()
+        if conn is None:
+            print("Erro: não foi possível conectar ao banco de dados.")
+            return
+
         cursor = conn.cursor()
         try:
+            # Query para inserir o exame
             query = """
-                INSERT INTO exams (id, doctor_id, patient_id, status, exam_date, exam_time)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO exams (doctor_id, patient_id, exam_date, exam_time, status)
+                VALUES (%s, %s, %s, %s, %s) RETURNING id
             """
-            cursor.execute(query, (self.id, self.doctor.id, self.patient.id, self.status, self.date, self.hour))
+            cursor.execute(query, (self.doctor.id, self.patient.id, self.date, self.hour, self.status))
             conn.commit()
-            print(f"Exame cadastrado para {self.patient.name} com {self.doctor.name} em {self.date} às {self.hour}.")
+
+            # Captura o id gerado pelo banco de dados
+            exam_id = cursor.fetchone()[0]
+            self.id = exam_id  # Atribui o id gerado ao objeto
+
+            print(f"Exame cadastrado para {self.patient.name} com {self.doctor.name} em {self.date} às {self.hour}. ID: {exam_id}")
+
         except Exception as e:
             print(f"Erro ao registrar exame: {e}")
+            conn.rollback()  # Caso ocorra algum erro, faz rollback da transação
         finally:
             cursor.close()
             conn.close()
 
+
     def update_exam(self):
         # Atualiza o status de um exame no banco de dados
         conn = get_connection()
+        if conn is None:
+            print("Erro: não foi possível conectar ao banco de dados.")
+            return
+
         cursor = conn.cursor()
         try:
-            query = """
+            query_update = """
                 UPDATE exams 
                 SET status = %s
                 WHERE id = %s
             """
-            cursor.execute(query, (self.status, self.id))
+            cursor.execute(query_update, (self.status, self.id))  # Corrigido aqui
             conn.commit()
             print(f"Exame de {self.patient.name} com {self.doctor.name} atualizado para '{self.status}'.")
+
         except Exception as e:
             print(f"Erro ao atualizar exame: {e}")
+            conn.rollback()  # Faz rollback em caso de erro
         finally:
             cursor.close()
             conn.close()
@@ -133,6 +124,7 @@ class Exam:
             print(f"Exame com ID '{exam_id}' removido com sucesso!")
         except Exception as e:
             print(f"Erro ao remover exame: {e}")
+            conn.rollback()  # Faz rollback em caso de erro
         finally:
             cursor.close()
             conn.close()

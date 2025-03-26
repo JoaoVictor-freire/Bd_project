@@ -248,21 +248,22 @@ def menu_exams():
         print("3. Confirmar exame")
         print("4. Cancelar exame")
         print("5. Listar exames")
-        print("6. Voltar ao menu principal")
+        print("6. Listar exames")
+        print("7. Voltar ao menu principal")
 
         option_e = input("Qual opção deseja realizar? ")
 
         if option_e == "1":
             limpar_cmd()
             doctor_id = input("Digite o ID do médico: ")
-            doctor = Doctor.search_by_id(int(doctor_id))
+            doctor = Doctor.search_by_id(doctor_id)
             if not doctor:
                 print("Médico não encontrado!")
                 pausar()
                 continue
 
             patient_id = input("Digite o ID do paciente: ")
-            patient = Patient.search_by_id(int(patient_id))
+            patient = Patient.search_by_id(patient_id)
             if not patient:
                 print("Paciente não encontrado!")
                 pausar()
@@ -272,19 +273,20 @@ def menu_exams():
             hour = input("Hora do exame (HH:MM): ")
 
             exam = Exam(doctor, patient, "Pending", date, hour)
+            Exam.register_exam()
             print("Exame cadastrado com sucesso!")
             pausar()
 
         elif option_e == "2":
             limpar_cmd()
             exam_id = input("Digite o ID do exame: ")
-            Exam.schedule(int(exam_id))
+            Exam.schedule(exam_id)
             pausar()
 
         elif option_e == "3":
             limpar_cmd()
             exam_id = input("Digite o ID do exame: ")
-            Exam.confirm(int(exam_id))
+            Exam.confirm(exam_id)
             pausar()
 
         elif option_e == "4":
