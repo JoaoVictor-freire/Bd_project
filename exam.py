@@ -3,12 +3,11 @@ from psycopg2 import sql
 from doctor import Doctor
 from patient import Patient
 from secrets import token_urlsafe
-from db import get_connection  # Supondo que a função de conexão com o banco está no arquivo db.py
+from db import get_connection
 
 class Exam:
-    # Método para cadastrar um exame no banco de dados
     def __init__(self, doctor: Doctor = None, patient: Patient = None, status: str = "", date: str = "", hour: str = "", id: str = None):
-        self.id = id or token_urlsafe(8)
+        self.id = id or token_urlsafe(8)  # Gera um ID único se não for fornecido
         self.doctor = doctor
         self.patient = patient
         self.status = status
@@ -60,64 +59,80 @@ class Exam:
 
     def details(self):
         print(f"Exame ID: {self.id}")
-        print(f"Paciente: {self.patient.getName()} | Médico: {self.doctor.getName()}")
+        print(f"Paciente: {self.patient.name} | Médico: {self.doctor.name}")
         print(f"Data: {self.date} | Hora: {self.hour} | Status: {self.status}")
 
-    # Método para registrar um exame no banco de dados
     def register_exam(self):
+        # Registra um exame no banco de dados
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO exams (id, doctor_id, patient_id, status, date, hour)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (self.id, self.doctor.id, self.patient.id, self.status, self.date, self.hour))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print(f"Exame cadastrado para {self.patient.getName()} com {self.doctor.getName()} em {self.date} às {self.hour}.")
+        try:
+            query = """
+                INSERT INTO exams (id, doctor_id, patient_id, status, exam_date, exam_time)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(query, (self.id, self.doctor.id, self.patient.id, self.status, self.date, self.hour))
+            conn.commit()
+            print(f"Exame cadastrado para {self.patient.name} com {self.doctor.name} em {self.date} às {self.hour}.")
+        except Exception as e:
+            print(f"Erro ao registrar exame: {e}")
+        finally:
+            cursor.close()
+            conn.close()
 
-    # Método para atualizar um exame no banco de dados
     def update_exam(self):
+        # Atualiza o status de um exame no banco de dados
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("""
-            UPDATE exams 
-            SET status = %s
-            WHERE id = %s
-        """, (self.status, self.id))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print(f"Exame de {self.patient.getName()} com {self.doctor.getName()} foi atualizado para status '{self.status}'.")
+        try:
+            query = """
+                UPDATE exams 
+                SET status = %s
+                WHERE id = %s
+            """
+            cursor.execute(query, (self.status, self.id))
+            conn.commit()
+            print(f"Exame de {self.patient.name} com {self.doctor.name} atualizado para '{self.status}'.")
+        except Exception as e:
+            print(f"Erro ao atualizar exame: {e}")
+        finally:
+            cursor.close()
+            conn.close()
 
-    # Método para listar todos os exames do banco de dados
     @staticmethod
     def list_all():
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT e.id, p.name, d.name, e.date, e.hour, e.status
-            FROM exams e
-            JOIN patients p ON e.patient_id = p.id
-            JOIN doctors d ON e.doctor_id = d.id
-        """)
-        exams = cursor.fetchall()
-        cursor.close()
-        conn.close()
+        # Lista todos os exames no banco de dados
+        try:
+            with get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        SELECT e.id, p.name, d.name, e.exam_date, e.exam_time, e.status
+                        FROM exams e
+                        JOIN patients p ON e.patient_id = p.id
+                        JOIN doctors d ON e.doctor_id = d.id
+                    """)
+                    exams = cursor.fetchall()
 
-        print("\nLista de Exames:")
-        for exam in exams:
-            print(f"ID: {exam[0]} | Paciente: {exam[1]} | Médico: {exam[2]} | Data: {exam[3]} | Hora: {exam[4]} | Status: {exam[5]}")
+                    if not exams:
+                        print("Nenhum exame registrado.")
+                    else:
+                        print("\nLista de Exames:")
+                        for exam in exams:
+                            print(f"ID: {exam[0]} | Paciente: {exam[1]} | Médico: {exam[2]} | Data: {exam[3]} | Hora: {exam[4]} | Status: {exam[5]}")
+        except Exception as e:
+            print(f"Erro ao listar exames: {e}")
 
-    # Método para remover um exame do banco de dados
     @staticmethod
     def remove(exam_id: str):
+        # Remove um exame do banco de dados
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("""
-            DELETE FROM exams WHERE id = %s
-        """, (exam_id,))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print(f"Exame com ID '{exam_id}' removido com sucesso!")
+        try:
+            cursor.execute("DELETE FROM exams WHERE id = %s", (exam_id,))
+            conn.commit()
+            print(f"Exame com ID '{exam_id}' removido com sucesso!")
+        except Exception as e:
+            print(f"Erro ao remover exame: {e}")
+        finally:
+            cursor.close()
+            conn.close()

@@ -1,6 +1,6 @@
 import psycopg2
 from secrets import token_urlsafe
-from db import get_connection  # Supondo que a função de conexão com o banco está no arquivo db.py
+from db import get_connection
 
 class Patient:
     # Método para criar um paciente no banco de dados
