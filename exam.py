@@ -2,47 +2,21 @@ import psycopg2
 from psycopg2 import sql
 from doctor import Doctor
 from patient import Patient
-from secrets import token_urlsafe
 from db import get_connection  # Supondo que a função de conexão com o banco está no arquivo db.py
 
 class Exam:
     # Método para cadastrar um exame no banco de dados
-    def __init__(self, doctor: Doctor = None, patient: Patient = None, status: str = "", date: str = "", hour: str = "", id: str = None):
-        self.id = id or token_urlsafe(8)
-        self.doctor = doctor
-        self.patient = patient
+    def __init__(self, doctor_id: str = "", doctor_name: str = "",  patient_id: str = "", patient_name: str = "" , status: str = "", date: str = "", hour: str = ""):
+        self.doctor_id = doctor_id
+        self.doctor_name = doctor_name
+        self.patient_id = patient_id
+        self.patient_name = patient_name
         self.status = status
         self.date = date
         self.hour = hour
 
-    def getId(self):
-        return self.id
 
-    def getDoctor(self):
-        return self.doctor
-
-    def getPatient(self):
-        return self.patient
-
-    def getStatus(self):
-        return self.status
-
-    def getDate(self):
-        return self.date
-
-    def getHour(self):
-        return self.hour
-
-    def setStatus(self, status):
-        self.status = status
-
-    def setDate(self, date):
-        self.date = date
-
-    def setHour(self, hour):
-        self.hour = hour
-
-    def schedule(self, doctor: Doctor, patient: Patient, date: str, hour: str, status: str = "Scheduled"):
+    def schedule(self, doctor: Doctor, patient: Patient, date: str, hour: str, status: str = "Agendado"):
         self.doctor = doctor
         self.patient = patient
         self.date = date
@@ -65,16 +39,23 @@ class Exam:
 
     # Método para registrar um exame no banco de dados
     def register_exam(self):
+        """Insere um novo exame no banco de dados."""
         conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO exams (id, doctor_id, patient_id, status, date, hour)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (self.id, self.doctor.id, self.patient.id, self.status, self.date, self.hour))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print(f"Exame cadastrado para {self.patient.getName()} com {self.doctor.getName()} em {self.date} às {self.hour}.")
+        cur = conn.cursor()
+        try:
+            query = sql.SQL("""
+                INSERT INTO exams (doctor_id, doctor_name, patient_id, patient_name, status, exam_date, exam_hour)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """)
+            cur.execute(query, (self.doctor_id, self.doctor_name, self.patient_id, self.patient_name, self.status, self.date, self.hour))
+            conn.commit()
+            print(f"Exame cadastrado para {self.patient_name} com {self.doctor_name} em {self.date} às {self.hour}.")
+        except Exception as e:
+            print(f"Erro ao cadastrar exame: {e}")
+        finally:
+            cur.close()
+            conn.close()
+
 
     # Método para atualizar um exame no banco de dados
     def update_exam(self):
