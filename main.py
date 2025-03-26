@@ -88,7 +88,7 @@ def menu_doctors():
                 print("Erro: ID inválido. O ID deve ser um número.")
                 print("Você será redirecionado ao menu principal.")
                 pausar()
-                return
+                continue
             
             doctor = Doctor.search_by_id(doctor_id)
 
@@ -191,7 +191,7 @@ def menu_patients():
                 print("Erro: ID inválido. O ID deve ser um número.")
                 print("Você será redirecionado ao menu principal.")
                 pausar()
-                return
+                continue
 
             patient = Patient.search_by_id(patient_id)
 
@@ -254,25 +254,53 @@ def menu_exams():
 
         if option_e == "1":
             limpar_cmd()
-            doctor_id = input("Digite o ID do médico: ")
-            doctor = Doctor.search_by_id(int(doctor_id))
-            if not doctor:
-                print("Médico não encontrado!")
+
+            try:
+                limpar_cmd()
+                name = input("Digite o nome do médico que está buscando: ")
+                encontrado = Doctor.list_by_name(name)
+
+                if not encontrado:
+                    pausar()
+                    continue
+                else:
+                    doctor_id = input("Digite o ID do médico: ")
+                    doctor = Doctor.search_by_id(doctor_id)
+                    doctor_name = doctor[1]
+                
+            except ValueError:
+                limpar_cmd()
+                print("Erro: ID inválido. O ID deve ser um número.")
+                print("Você será redirecionado ao menu principal.")
                 pausar()
                 continue
 
-            patient_id = input("Digite o ID do paciente: ")
-            patient = Patient.search_by_id(int(patient_id))
-            if not patient:
-                print("Paciente não encontrado!")
+            try:
+                limpar_cmd()    
+                name = input("Digite o nome do paciente que está buscando: ")
+                encontrado = Patient.list_by_name(name)
+
+                if not encontrado:
+                    pausar()
+                    continue
+                else: 
+                    patient_id = input("Digite o ID do paciente: ")
+                    patient = Patient.search_by_id(patient_id)
+                    patient_name = patient[1]
+
+            except ValueError:
+                print("Erro: ID inválido. O ID deve ser um número.")
+                print("Você será redirecionado ao menu principal.")
                 pausar()
                 continue
+
+
 
             date = input("Data do exame (DD/MM/AAAA): ")
             hour = input("Hora do exame (HH:MM): ")
 
-            exam = Exam(doctor, patient, "Pending", date, hour)
-            print("Exame cadastrado com sucesso!")
+            exam = Exam(doctor_id, doctor_name, patient_id, patient_name, "", date, hour)
+            Exam.register_exam(exam)
             pausar()
 
         elif option_e == "2":
