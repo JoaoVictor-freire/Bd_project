@@ -243,12 +243,13 @@ def menu_exams():
     while True:
         limpar_cmd()
         print("\nExames da Clínica NovaMed")
-        print("1. Cadastrar exame")
-        print("2. Agendar exame")
+        print("1. Agendar exame")
+        print("2. Remarcar exame")
         print("3. Confirmar exame")
         print("4. Cancelar exame")
         print("5. Listar exames")
-        print("6. Voltar ao menu principal")
+        print("6. Remover exames")
+        print("7. Voltar ao menu principal")
 
         option_e = input("Qual opção deseja realizar? ")
 
@@ -295,38 +296,148 @@ def menu_exams():
                 continue
 
 
-
             date = input("Data do exame (DD/MM/AAAA): ")
             hour = input("Hora do exame (HH:MM): ")
 
-            exam = Exam(doctor_id, doctor_name, patient_id, patient_name, "", date, hour)
+            exam = Exam(doctor_id, doctor_name, patient_id, patient_name, "Agendado", date, hour)
             Exam.register_exam(exam)
             pausar()
 
         elif option_e == "2":
             limpar_cmd()
-            exam_id = input("Digite o ID do exame: ")
-            Exam.schedule(int(exam_id))
+            try:
+                limpar_cmd()
+                name = input("Digite o nome do paciente que está reagendando o exame: ")
+                encontrado = Exam.search_by_patient_name(name)
+                
+                if not encontrado:
+                    pausar()
+                    continue
+                else:
+                    exam_id = input("Digite o ID do exame: ")
+                    exam = Exam.search_by_id(exam_id)  # Busca a instância do exame pelo ID
+                    if not exam:
+                        print("Exame não encontrado.")
+                        pausar()
+                        continue
+            except ValueError:
+                print("Erro: ID inválido. O ID deve ser um número.")
+                print("Você será redirecionado ao menu principal.")
+                pausar()
+                continue
+
+            date = input("Nova data do exame (DD/MM/AAAA): ")
+            hour = input("Nova hora do exame (HH:MM): ")
+            # Chama o método update_exam, passando o ID e os novos valores
+            exam.update_exam(exam_id, date, hour)
             pausar()
 
+
+
         elif option_e == "3":
-            limpar_cmd()
-            exam_id = input("Digite o ID do exame: ")
-            Exam.confirm(int(exam_id))
+            try:
+                limpar_cmd()
+                name = input("Digite o nome do paciente que está confirmando o exame: ")
+                encontrado = Exam.search_by_patient_name(name)
+                
+                if not encontrado:
+                    pausar()
+                    continue
+                else:
+                    exam_id = input("Digite o ID do exame: ")
+                    exam = Exam.search_by_id(exam_id)  # Busca a instância do exame pelo ID
+                    if not exam:
+                        print("Exame não encontrado.")
+                        pausar()
+                        continue
+                    # Se o exame for encontrado, podemos utilizar o patient_name já armazenado na instância
+            except ValueError:
+                print("Erro: ID inválido. O ID deve ser um número.")
+                print("Você será redirecionado ao menu principal.")
+                pausar()
+                continue
+            
+            exam.confirm()
             pausar()
 
         elif option_e == "4":
-            limpar_cmd()
-            exam_id = input("Digite o ID do exame: ")
-            Exam.cancel(int(exam_id))
+            try:
+                limpar_cmd()
+                name = input("Digite o nome do paciente que está cancelando o exame: ").strip()
+
+                # Busca todos os exames do paciente
+                encontrado = Exam.search_by_patient_name(name)
+                
+                if not encontrado:
+                    pausar()
+                    continue
+
+                else:
+                    exam_id = input("Digite o ID do exame: ")
+                    exam = Exam.search_by_id(exam_id)  # Busca a instância do exame pelo ID
+                
+                    if not exam:
+                        print("Exame não encontrado.")
+                        pausar()
+                        continue                    
+                
+            except ValueError:
+                print("Erro: ID inválido. O ID deve ser um número.")
+                print("Você será redirecionado ao menu principal.")
+                pausar()
+                continue
+            
+            # Cancela o exame
+            exam.cancel()
+
+            # Pergunta se o usuário deseja remover o exame cancelado do banco de dados
+            remover = input("Deseja remover o exame cancelado do histórico? (S ou N): ").strip().upper()
+            
+            if remover == "S":
+                Exam.remove(exam.id)  # Chamando corretamente o método estático
+            elif remover == "N":
+                print("Voltando ao menu de exames...")
+            
             pausar()
 
-        elif option_e == "5":
+
+        elif option_e == "5": 
             limpar_cmd()
             Exam.list_all()
             pausar()
 
         elif option_e == "6":
+            try:
+                limpar_cmd()
+                name = input("Digite o nome do paciente que está removendo o exame: ").strip()
+
+                # Busca todos os exames do paciente
+                encontrado = Exam.search_by_patient_name(name)
+                
+                if not encontrado:
+                    pausar()
+                    continue
+
+                else:
+                    exam_id = input("Digite o ID do exame: ")
+                    exam = Exam.search_by_id(exam_id)  # Busca a instância do exame pelo ID
+                
+                    if not exam:
+                        print("Exame não encontrado.")
+                        pausar()
+                        continue                    
+                
+            except ValueError:
+                print("Erro: ID inválido. O ID deve ser um número.")
+                print("Você será redirecionado ao menu principal.")
+                pausar()
+                continue
+            
+            # Cancela o exame
+            exam.remove(exam_id)
+            pausar()
+
+        elif option_e == "7":
             limpar_cmd()
             print("Voltando ao menu principal...")
             break

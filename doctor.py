@@ -12,7 +12,7 @@ class Doctor:
 
 
     def cadastrar(self):
-        """Insere um novo médico no banco de dados."""
+        # Insere um novo médico no banco de dados
         conn = get_connection()
         cur = conn.cursor()
         try:
@@ -32,7 +32,7 @@ class Doctor:
 
     @staticmethod
     def update(doctor_id, name, specialty, service_hour, contact, salary):
-        """Atualiza os dados do médico no banco de dados."""
+        # Atualiza os dados do médico no banco de dados.
         conn = get_connection()
         if conn is None:
             print("Erro: não foi possível conectar ao banco de dados.")
@@ -61,7 +61,7 @@ class Doctor:
 
     @staticmethod
     def remove(doctor_id: str):
-        """Remove um médico pelo ID do banco de dados."""
+        # Remove um médico pelo ID do banco de dados
         conn = get_connection()
         cur = conn.cursor()
         try:
@@ -77,7 +77,7 @@ class Doctor:
 
     @staticmethod
     def list_all():
-        """Lista todos os médicos do banco de dados."""
+        # Lista todos os médicos do banco de dados
         conn = get_connection()
         cur = conn.cursor()
         try:
@@ -94,7 +94,10 @@ class Doctor:
 
     @staticmethod
     def list_by_name(name: str):
-        """Lista todos os médicos cujo nome contenha a string informada (case insensitive)."""
+        # Lista todos os médicos cujo nome contenha a string informada (case insensitive)
+        if name == "":
+            return False
+        
         conn = get_connection()
         cur = conn.cursor()
         try:
@@ -121,7 +124,7 @@ class Doctor:
 
     @staticmethod
     def search_by_id(doctor_id: str):
-        """Busca um médico pelo ID no banco de dados."""
+        # Busca um médico pelo ID no banco de dados
         conn = get_connection()
         cur = conn.cursor()
         try:
