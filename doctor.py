@@ -3,12 +3,13 @@ from psycopg2 import sql
 from db import get_connection
 
 class Doctor:
-    def __init__(self, name: str = "", specialty: str = "", service_hour: str = "", contact: str = "", salary: int = 0):
+    def __init__(self, name: str = "", specialty: str = "", service_hour: str = "", contact: str = "", salary: int = 0, city: str = ""):
         self.name = name
         self.specialty = specialty
         self.service_hour = service_hour
         self.contact = contact
         self.salary = salary
+        self.city = city
 
 
     def cadastrar(self):
@@ -17,10 +18,10 @@ class Doctor:
         cur = conn.cursor()
         try:
             query = sql.SQL("""
-                INSERT INTO doctors (name, specialty, service_hour, contact, salary)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO doctors (name, specialty, service_hour, contact, salary, city)
+                VALUES (%s, %s, %s, %s, %s, %s)
             """)
-            cur.execute(query, (self.name, self.specialty, self.service_hour, self.contact, self.salary))
+            cur.execute(query, (self.name, self.specialty, self.service_hour, self.contact, self.salary, self.city))
             conn.commit()
             print("Médico cadastrado com sucesso!")
         except Exception as e:
@@ -31,7 +32,7 @@ class Doctor:
 
 
     @staticmethod
-    def update(doctor_id, name, specialty, service_hour, contact, salary):
+    def update(doctor_id, name, specialty, service_hour, contact, salary, city):
         """Atualiza os dados do médico no banco de dados."""
         conn = get_connection()
         if conn is None:
@@ -42,10 +43,11 @@ class Doctor:
         try:
             query = """
                 UPDATE doctors
-                SET name = %s, specialty = %s, service_hour = %s, contact = %s, salary = %s
+                SET name = %s, specialty = %s, service_hour = %s, contact = %s, salary = %s, city = %s
                 WHERE id = %s
             """
-            cur.execute(query, (name, specialty, service_hour, contact, salary, doctor_id))
+            cur.execute(query, (name, specialty, service_hour, contact, salary, city, doctor_id))
+
 
             if cur.rowcount == 0:
                 print(f"Nenhum registro atualizado. Verifique se o ID {doctor_id} existe.")

@@ -4,12 +4,14 @@ from db import get_connection  # Supondo que a função de conexão com o banco 
 
 class Patient:
     # Método para criar um paciente no banco de dados
-    def __init__(self, name: str = "", age: int = 0, history: str = "", contact: str = "", address: str = "", id: str = None):
+    def __init__(self, name: str = "", age: int = 0, history: str = "", contact: str = "", address: str = "", city: str = "", tags: str = "", id: str = None):
         self.name = name
         self.age = age
         self.history = history
         self.contact = contact
         self.address = address
+        self.city = city
+        self.tags = tags
 
 
     # Método para registrar o paciente no banco de dados
@@ -19,10 +21,10 @@ class Patient:
         cur = conn.cursor()
         try:
             query = sql.SQL("""
-                INSERT INTO patients (name, age, history, contact, address)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO patients (name, age, history, contact, address, city, tags)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """)
-            cur.execute(query, (self.name, self.age, self.history, self.contact, self.address))
+            cur.execute(query, (self.name, self.age, self.history, self.contact, self.address, self.city, self.tags))
             conn.commit()
             print(f"Paciente {self.name} cadastrado com sucesso.")
         except Exception as e:
@@ -32,7 +34,7 @@ class Patient:
             conn.close()
 
     @staticmethod
-    def update(patient_id, name, age, history, contact, address):
+    def update(patient_id, name, age, history, contact, address, city, tags):
         """Atualiza os dados do paciente no banco de dados."""
         conn = get_connection()
         if conn is None:
@@ -43,10 +45,10 @@ class Patient:
         try:
             query = """
                 UPDATE patients
-                SET name = %s, age = %s, history = %s, contact = %s, address = %s
+                SET name = %s, age = %s, history = %s, contact = %s, address = %s, city = %s, tags = %s
                 WHERE id = %s
             """
-            cur.execute(query, (name, age, history, contact, address, patient_id))
+            cur.execute(query, (name, age, history, contact, address, city, tags, patient_id))
 
             if cur.rowcount == 0:
                 print(f"Nenhum registro atualizado. Verifique se o ID {patient_id} existe.")

@@ -65,8 +65,9 @@ def menu_doctors():
             service_hour = input("Horário de Serviço (00:00 - 00:00): ")
             contact = input("Contato: ")
             salary = input("Salário: ")
+            city = input("Cidade: ")
 
-            doctor1 = Doctor(name, specialty, service_hour, contact, salary)
+            doctor1 = Doctor(name, specialty, service_hour, contact, salary, city)
             Doctor.cadastrar(doctor1)
             pausar()
 
@@ -98,10 +99,11 @@ def menu_doctors():
                 new_service_hour = input(f"Horário de atendimento ({doctor[3]}): ") or doctor[3]
                 new_contact = input(f"Contato ({doctor[4]}): ") or doctor[4]
                 new_salary = input(f"Salário ({doctor[5]}): ") or doctor[5]
+                new_city = input(f"Cidade ({doctor[6]}): ") or doctor[6]
                 
 
                 # Passando os 6 parâmetros diretamente para o método update
-                Doctor.update(doctor[0], new_name, new_specialty, new_service_hour, new_contact, new_salary)
+                Doctor.update(doctor[0], new_name, new_specialty, new_service_hour, new_contact, new_salary, new_city)
             else:
                 print("Médico não encontrado!")
 
@@ -169,8 +171,10 @@ def menu_patients():
             history = input("Histórico médico: ")
             contact = input("Contato: ")
             address = input("Endereço: ")
+            city = input("Cidade: ")
+            tags = input("Tags (áreas de interesse separados por virgula): ")
 
-            patient1 = Patient(name, age, history, contact, address)
+            patient1 = Patient(name, age, history, contact, address, city, tags)
             Patient.cadastrar(patient1)
             pausar()
 
@@ -202,8 +206,10 @@ def menu_patients():
                 new_history = input(f"Histórico ({patient[3]}): ") or patient[3]
                 new_contact = input(f"Contato ({patient[4]}): ") or patient[4]
                 new_address = input(f"Endereço ({patient[5]}): ") or patient[5]
+                new_city = input(f"Cidade ({patient[6]}): ") or patient[6]
+                new_tags = input(f"Tags ({patient[7]}): ") or patient[7]
 
-                Patient.update(patient[0], new_name, new_age, new_history, new_contact, new_address)
+                Patient.update(patient[0], new_name, new_age, new_history, new_contact, new_address, new_city, new_tags)
             else:
                 print("Paciente não encontrado.")
 
@@ -249,6 +255,11 @@ def menu_exams():
         print("4. Cancelar exame")
         print("5. Listar exames")
         print("6. Voltar ao menu principal")
+        print("7. Listar exames com desconto aplicado")
+        print("8. Gerar relatório mensal por médico")
+        print("9. Filtrar exames por faixa de preço")
+
+
 
         option_e = input("Qual opção deseja realizar? ")
 
@@ -298,8 +309,25 @@ def menu_exams():
 
             date = input("Data do exame (DD/MM/AAAA): ")
             hour = input("Hora do exame (HH:MM): ")
+            price = input("Valor do exame (apenas números, ex: 150.00): ")
+            payment_method = input("Forma de pagamento (pix, boleto, cartão, berries): ")
 
-            exam = Exam(doctor_id, doctor_name, patient_id, patient_name, "", date, hour)
+            try:
+                price = float(price)
+            except ValueError:
+                print("Valor inválido. Usando valor padrão de R$ 100,00.")
+                price = 100.00
+
+            exam = Exam(
+                doctor_id=doctor_id,
+                doctor_name=doctor_name,
+                patient_id=patient_id,
+                patient_name=patient_name,
+                payment_method=payment_method,
+                date=date,
+                hour=hour,
+                price=price
+            )
             Exam.register_exam(exam)
             pausar()
 
@@ -330,6 +358,23 @@ def menu_exams():
             limpar_cmd()
             print("Voltando ao menu principal...")
             break
+
+        elif option_e == "7":
+            limpar_cmd()
+            Exam.list_with_discount()
+            pausar()
+        
+        elif option_e == "8":
+            limpar_cmd()
+            Exam.relatorio_mensal_por_data()
+            pausar()
+            
+        elif option_e == "9":
+            limpar_cmd()
+            Exam.filter_by_price_range()
+            pausar()
+
+
 
         else:
             limpar_cmd()
