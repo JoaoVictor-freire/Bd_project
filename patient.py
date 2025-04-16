@@ -16,7 +16,7 @@ class Patient:
 
     # Método para registrar o paciente no banco de dados
     def cadastrar(self):
-        """Insere um novo paciente no banco de dados."""
+        # Insere um novo paciente no banco de dados
         conn = get_connection()
         cur = conn.cursor()
         try:
@@ -93,7 +93,10 @@ class Patient:
 
     @staticmethod
     def list_by_name(name: str):
-        """Lista todos os pacientes cujo nome contenha a string informada."""
+        # Lista todos os pacientes cujo nome contenha a string informada
+        if name == "":
+            return False
+         
         conn = get_connection()
         cur = conn.cursor()
         try:
@@ -123,7 +126,7 @@ class Patient:
 
     @staticmethod
     def search_by_id(patient_id: str):
-        """Busca um paciente pelo ID no banco de dados."""
+        # Busca um paciente pelo ID no banco de dados
         conn = get_connection()
         cur = conn.cursor()
         try:

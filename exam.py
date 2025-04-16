@@ -55,16 +55,54 @@ class Exam:
         self.register_exam()
 
     def cancel(self):
-        self.status = "Canceled"
-        self.update_exam()
+        if self.id is None:
+            print("ID do exame não definido.")
+            return
+        conn = get_connection()
+        cur = conn.cursor()
+        try:
+            query = sql.SQL("""
+                UPDATE exams
+                SET status = {}
+                WHERE id = %s
+            """).format(sql.Literal("Cancelado"))
+
+            cur.execute(query, (self.id,))  # Usa o id armazenado na instância
+            conn.commit()
+            print(f"Exame com ID {self.id} atualizado para status 'Cancelado'.")
+        except Exception as e:
+            print(f"Erro ao atualizar status do exame: {e}")
+        finally:
+            cur.close()
+            conn.close()
+
 
     def confirm(self):
-        self.status = "Confirmed"
-        self.update_exam()
+        if self.id is None:
+            print("ID do exame não definido.")
+            return
+        conn = get_connection()
+        cur = conn.cursor()
+        try:
+            query = sql.SQL("""
+                UPDATE exams
+                SET status = {}
+                WHERE id = %s
+            """).format(sql.Literal("Confirmado"))
+
+            cur.execute(query, (self.id,))  # Usa o id armazenado na instância
+            conn.commit()
+            print(f"Exame com ID {self.id} atualizado para status 'Confirmado'.")
+        except Exception as e:
+            print(f"Erro ao atualizar status do exame: {e}")
+        finally:
+            cur.close()
+            conn.close()
+
 
     def details(self):
         print(f"Exame ID: {self.id}")
-        print(f"Paciente: {self.patient.getName()} | Médico: {self.doctor.getName()}")
+        print(f"Paciente: {self.patient_name} | Médico: {self.doctor_name}")
         print(f"Data: {self.date} | Hora: {self.hour} | Status: {self.status}")
 
 
@@ -108,19 +146,26 @@ class Exam:
             conn.close()
 
 
-    # Método para atualizar um exame no banco de dados
-    def update_exam(self):
+    def update_exam(self, exam_id, new_date, new_hour):
         conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            UPDATE exams 
-            SET status = %s
-            WHERE id = %s
-        """, (self.status, self.id))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print(f"Exame de {self.patient.getName()} com {self.doctor.getName()} foi atualizado para status '{self.status}'.")
+        cur = conn.cursor()
+        try:
+            # Atualiza data, hora e status do exame com base no ID
+            query = sql.SQL("""
+                UPDATE exams
+                SET exam_date = %s, exam_hour = %s, status = 'Remarcado'
+                WHERE id = %s
+            """)
+            # Passa os novos parâmetros: data e hora
+            cur.execute(query, (new_date, new_hour, exam_id))
+            conn.commit()
+            print(f"Exame remarcado para data '{new_date}' e hora '{new_hour}' com status 'Remarcado'.")
+        except Exception as e:
+            print(f"Erro ao atualizar exame: {e}")
+        finally:
+            cur.close()
+            conn.close()
+
 
     # Método para listar todos os exames do banco de dados
     @staticmethod
